@@ -90,7 +90,7 @@ def OMP(X: np.ndarray, y: np.ndarray, k: int) -> tuple:
     return (bases, c)
 
 
-def Lasso(X: np.ndarray, y: np.ndarray, alpha: float = 1.0, max_iter: int = 1000, tol: float = 1e-4) -> np.ndarray:
+def my_Lasso(X: np.ndarray, y: np.ndarray, alpha: float = 1.0, max_iter: int = 1000, tol: float = 1e-4) -> np.ndarray:
     """
         Implement Lasso from ppt: Sparse representation L1-norm solutions p.11
 
@@ -286,13 +286,12 @@ def Q7(X: np.ndarray, y: np.ndarray):
     plt.savefig("./fig/Q7-2.jpg", bbox_inches="tight")
 
     # Q7 - 3
-    from sklearn.decomposition import sparse_encode
+    # from sklearn.decomposition import sparse_encode
+    from sklearn.linear_model import Lasso
 
     lasso_params = {
-        "algorithm": "lasso_cd",
-        "alpha": 0.9,  # default = 1
-        "max_iter": 10000,  # default = 1000
-        "n_jobs": -1
+        "alpha": 1,  # default = 1
+        "max_iter": 1000,  # default = 1000
     }
 
     # Normalize
@@ -303,9 +302,11 @@ def Q7(X: np.ndarray, y: np.ndarray):
             n_bases[i, :] = n_bases[i, :] / b_norm[i]
     n_eight = eight / np.linalg.norm(eight)
 
-    code = sparse_encode(n_eight.reshape(1, -1), n_bases, **lasso_params)
+    # code = sparse_encode(n_eight.reshape(1, -1), n_bases, **lasso_params)
+    code = Lasso(**lasso_params).fit(n_bases.T, n_eight.reshape(-1, 1))
 
-    plt.imshow(code.dot(n_bases).reshape(28, 28), "gray")
+    # plt.imshow(code.dot(n_bases).reshape(28, 28), "gray")
+    plt.imshow(n_bases.T.dot(code.coef_).reshape(28, 28), "gray")
     plt.axis("off")
     plt.savefig("./fig/Q7-3.jpg", bbox_inches="tight")
     plt.close()
@@ -313,9 +314,11 @@ def Q7(X: np.ndarray, y: np.ndarray):
     # Q7 - 4
     lasso_params["alpha"] = 0.1
 
-    code = sparse_encode(n_eight.reshape(1, -1), n_bases, **lasso_params)
+    # code = sparse_encode(n_eight.reshape(1, -1), n_bases, **lasso_params)
+    code = Lasso(**lasso_params).fit(n_bases.T, n_eight.reshape(-1, 1))
 
-    plt.imshow(code.dot(n_bases).reshape(28, 28), "gray")
+    # plt.imshow(code.dot(n_bases).reshape(28, 28), "gray")
+    plt.imshow(n_bases.T.dot(code.coef_).reshape(28, 28), "gray")
     plt.axis("off")
     plt.savefig("./fig/Q7-4.jpg", bbox_inches="tight")
     plt.close()
